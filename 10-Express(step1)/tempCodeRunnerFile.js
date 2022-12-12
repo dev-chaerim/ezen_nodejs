@@ -1,0 +1,1 @@
+const html = "<h1><span style='color:#0066ff'>" + req.body.username + "</span>님은 <span style='color:#ff6600'>" + req.body.email+ "</span> 입니다.</h1>";

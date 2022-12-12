@@ -1,0 +1,50 @@
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <meta charset="UTF-8" />
+        <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+        <title>Document</title>
+    </head>
+    <body>
+        <h1>백엔드에 링크로 GET 파라미터 전송하기</h1>
+
+        <h2>100 + 200 = ?</h2>
+
+        <ul>
+            <li><a class="link" href="#" data-ans="100">100</a></li>
+            <li><a class="link" href="#" data-ans="200">200</a></li>
+            <li><a class="link" href="#" data-ans="300">300</a></li>
+            <li><a class="link" href="#" data-ans="400">400</a></li>
+            <li><a class="link" href="#" data-ans="500">500</a></li>
+        </ul>
+
+        <div id="console"></div>
+
+        <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
+        <script>
+            document.querySelectorAll('.link').forEach((v, i) => {
+                v.addEventListener('click', async (e) => {
+                    e.preventDefault();
+                    const ans = e.currentTarget.dataset.ans;
+
+                    try {
+                        const response = await axios.get('/send_get', {
+                            params: {
+                                answer: ans,
+                                myname: 'axios',
+                                birth: '2022-09-25'
+                            }
+                        });
+
+                        document.querySelector("#console").insertAdjacentHTML('beforeend', response.data);
+                    } catch (error) {
+                        const errorMsg = '[' + error.response.status + '] ' + error.response.statusText;
+                        alert(errorMsg);
+                        return;
+                    }
+                });
+            });
+        </script>
+    </body>
+</html>

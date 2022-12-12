@@ -1,0 +1,96 @@
+<!DOCTYPE html>
+<html lang="ko">
+    <head>
+        <meta charset="UTF-8" />
+        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+        <title>Document</title>
+        <style>
+            #file-input {
+                display: none;
+            }
+
+            .image-upload label {
+                cursor: pointer;
+            }
+
+            #preview-container {
+                display: flex;
+                flex-wrap: wrap;
+            }
+
+            #preview-container .preview {
+                display: block;
+                width: 100px;
+                height: 100px;
+                border: 1px solid #555;
+                box-sizing: border-box;
+                margin: 10px;
+                object-fit: cover;
+            }
+        </style>
+    </head>
+    <body>
+        <div class="image-upload">
+            <label for="file-input">
+                <img src="assets/img/upload.jpg" />
+            </label>
+
+            <input id="file-input" type="file" />
+        </div>
+
+        <!-- 미리보기를 표시할 컨테이너 -->
+        <div id="preview-container"></div>
+
+        <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
+        <script>
+            // File 요소에 대한 change 이벤트
+            document.querySelector("#file-input").addEventListener("change", async (e) => {
+                // 선택된 파일의 파일리스트--> 싱글 업로드이므로 단 하나의 원소만 선택되기 때문에 0번째 항목에 직접 접근한다.
+                const file = e.currentTarget.files[0];
+                console.log(file);
+
+                // 백엔드로의 전송을 위한 FormData객체 생성
+                const formData = new FormData();
+                // <input>태그의 name속성과 파일객체를 formData에 추가한다.
+                formData.append("myphoto", file);
+                // 추가적인 텍스트 데이터도 formData객체에 추가한다.
+                formData.append("username", "lee");
+                formData.append("email", "leekh4232@gmail.com");
+
+                let json = null;
+
+                try {
+                    const response = await axios.post("/upload/single", formData, {
+                        headers: {
+                            "Content-Type": "multipart/form-data",
+                        },
+                    });
+
+                    json = response.data;
+                } catch (err) {
+                    json = err.response.data;
+                    alert(`[${json.rt}] ${json.rtmsg}`);
+                    return;
+                }
+
+                console.log(json);
+
+                // 미리보기를 표시할 컨테이너 객체
+                const previewContainer = document.querySelector("#preview-container");
+
+                // 이미지를 표시할 img태그를 생성
+                // createElement는 <body>태그 안에 코딩되어 있지 않은 새로운 HTML 태그를 생성
+                // --> 화면상에 보이지 않음
+                const imgTag = document.createElement("img");
+                imgTag.classList.add("preview");
+                imgTag.setAttribute("src", json.url);
+                imgTag.setAttribute("title", json.fieldname);
+                imgTag.setAttribute("alt", json.originalname);
+
+                // JS로 생성한 새로운 HTML태그를 화면상에 표시하기 위해
+                // 기존의 Elemenet객체 안에 자식요소로 추가(append)
+                previewContainer.appendChild(imgTag);
+            });
+        </script>
+    </body>
+</html>
